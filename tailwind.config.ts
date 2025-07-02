@@ -12,7 +12,26 @@ export default {
         "2xl": "1400px",
       },
     },
+    screens: {
+      xs: "475px",
+      sm: "640px",
+      md: "768px",
+      lg: "1024px",
+      xl: "1280px",
+      "2xl": "1536px",
+      // OnePlus Nord CE 2 Lite 5G specific
+      oneplus: "412px",
+    },
     extend: {
+      spacing: {
+        "safe-top": "env(safe-area-inset-top)",
+        "safe-bottom": "env(safe-area-inset-bottom)",
+      },
+      minHeight: {
+        touch: "44px",
+        "screen-safe":
+          "calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom))",
+      },
       gridTemplateColumns: {
         "13": "repeat(13, minmax(0, 1fr))",
         "14": "repeat(14, minmax(0, 1fr))",
