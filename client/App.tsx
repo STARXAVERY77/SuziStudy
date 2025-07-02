@@ -19,6 +19,8 @@ import AITutor from "./pages/AITutor";
 import Flashcards from "./pages/Flashcards";
 import LeetCode from "./pages/LeetCode";
 import Viva from "./pages/Viva";
+import SmartScheduler from "./pages/SmartScheduler";
+import MemoryManager from "./pages/MemoryManager";
 import NotFound from "./pages/NotFound";
 import { PlaceholderPage } from "./pages/PlaceholderPage";
 import { Target, Settings } from "lucide-react";
@@ -46,6 +48,8 @@ const App = () => (
           <Route path="/flashcards" element={<Flashcards />} />
           <Route path="/leetcode" element={<LeetCode />} />
           <Route path="/viva" element={<Viva />} />
+          <Route path="/smart-scheduler" element={<SmartScheduler />} />
+          <Route path="/memory" element={<MemoryManager />} />
           <Route
             path="/goals"
             element={

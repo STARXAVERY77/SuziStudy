@@ -15,6 +15,8 @@ import {
   Zap,
   Code,
   GraduationCap,
+  Cpu,
+  Database,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -36,6 +38,8 @@ const navigation = [
 
 const bottomNavigation = [
   { name: "Chat", href: "/chat", icon: MessageCircle },
+  { name: "Smart Schedule", href: "/smart-scheduler", icon: Cpu },
+  { name: "AI Memory", href: "/memory", icon: Database },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
