@@ -153,7 +153,13 @@ export function NotificationSystem() {
   }, []);
 
   const showNotification = (notification: Notification) => {
-    setNotifications((prev) => [notification, ...prev]);
+    // Ensure timestamp is always set
+    const notificationWithTimestamp = {
+      ...notification,
+      timestamp: notification.timestamp || new Date(),
+    };
+
+    setNotifications((prev) => [notificationWithTimestamp, ...prev]);
 
     // Play sound if enabled
     if (notification.sound && soundEnabled) {
