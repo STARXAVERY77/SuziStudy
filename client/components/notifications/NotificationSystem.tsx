@@ -484,7 +484,8 @@ export function NotificationSystem() {
 
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-xs text-muted-foreground">
-                      {notification.timestamp.toLocaleTimeString()}
+                      {notification.timestamp?.toLocaleTimeString() ||
+                        "Just now"}
                     </span>
                     {currentSession?.isActive && (
                       <span className="text-xs text-muted-foreground">
