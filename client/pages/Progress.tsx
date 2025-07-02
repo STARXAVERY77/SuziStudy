@@ -1,7 +1,7 @@
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
+import { Progress as ProgressBar } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import {
   BarChart3,
@@ -327,13 +327,16 @@ export default function Progress() {
                       </div>
                       <div className="flex space-x-2">
                         <div className="flex-1">
-                          <Progress
+                          <ProgressBar
                             value={(week.hours / 25) * 100}
                             className="h-2"
                           />
                         </div>
                         <div className="flex-1">
-                          <Progress value={week.completion} className="h-2" />
+                          <ProgressBar
+                            value={week.completion}
+                            className="h-2"
+                          />
                         </div>
                       </div>
                     </div>
@@ -366,7 +369,7 @@ export default function Progress() {
                         {subject.progress}%
                       </span>
                     </div>
-                    <Progress value={subject.progress} className="h-2" />
+                    <ProgressBar value={subject.progress} className="h-2" />
                     <div className="text-xs text-muted-foreground">
                       {subject.totalHours} hours completed
                     </div>
