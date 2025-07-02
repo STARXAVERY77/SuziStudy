@@ -12,18 +12,24 @@ import {
   Mic,
   FileText,
   GitBranch,
+  Zap,
+  Code,
+  GraduationCap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: Home },
+  { name: "AI Tutor", href: "/ai-tutor", icon: Brain },
   { name: "Subjects", href: "/subjects", icon: BookOpen },
   { name: "Schedule", href: "/schedule", icon: Calendar },
+  { name: "Flashcards", href: "/flashcards", icon: Zap },
+  { name: "LeetCode", href: "/leetcode", icon: Code },
+  { name: "Viva Practice", href: "/viva", icon: GraduationCap },
   { name: "Materials", href: "/materials", icon: FileText },
-  { name: "AI Tutor", href: "/ai-tutor", icon: Brain },
+  { name: "Mind Maps", href: "/mindmap", icon: GitBranch },
   { name: "Focus Timer", href: "/focus", icon: Timer },
   { name: "Progress", href: "/progress", icon: BarChart3 },
-  { name: "Mind Maps", href: "/mindmap", icon: GitBranch },
   { name: "Voice Assistant", href: "/voice", icon: Mic },
   { name: "Goals", href: "/goals", icon: Target },
 ];

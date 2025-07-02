@@ -15,6 +15,10 @@ import Voice from "./pages/Voice";
 import Progress from "./pages/Progress";
 import Materials from "./pages/Materials";
 import MindMap from "./pages/MindMap";
+import AITutor from "./pages/AITutor";
+import Flashcards from "./pages/Flashcards";
+import LeetCode from "./pages/LeetCode";
+import Viva from "./pages/Viva";
 import NotFound from "./pages/NotFound";
 import { PlaceholderPage } from "./pages/PlaceholderPage";
 import { Target, Settings } from "lucide-react";
@@ -38,6 +42,10 @@ const App = () => (
           <Route path="/chat" element={<Chat />} />
           <Route path="/materials" element={<Materials />} />
           <Route path="/mindmap" element={<MindMap />} />
+          <Route path="/ai-tutor" element={<AITutor />} />
+          <Route path="/flashcards" element={<Flashcards />} />
+          <Route path="/leetcode" element={<LeetCode />} />
+          <Route path="/viva" element={<Viva />} />
           <Route
             path="/goals"
             element={
@@ -48,7 +56,6 @@ const App = () => (
               />
             }
           />
-          <Route path="/ai-tutor" element={<Chat />} />
           <Route
             path="/settings"
             element={

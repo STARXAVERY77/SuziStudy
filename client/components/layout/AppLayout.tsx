@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Sidebar } from "./Sidebar";
-import { StudyBuddy } from "../ai/StudyBuddy";
+import { EnhancedStudyBuddy } from "../ai/EnhancedStudyBuddy";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -11,7 +11,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     <div className="flex h-screen bg-background">
       <Sidebar />
       <main className="flex-1 overflow-auto">{children}</main>
-      <StudyBuddy />
+      <EnhancedStudyBuddy />
     </div>
   );
 }
