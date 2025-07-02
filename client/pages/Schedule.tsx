@@ -2,7 +2,25 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useState, useEffect } from "react";
 import {
   Calendar,
   Clock,
@@ -14,6 +32,10 @@ import {
   BookOpen,
   Target,
   Brain,
+  Zap,
+  Settings,
+  CalendarDays,
+  Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -111,13 +133,150 @@ const timeSlots = [
 
 const weekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
+// IST time helpers
+const getISTTime = () => {
+  return new Date().toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata",
+    hour12: false,
+  });
+};
+
+const getISTDate = () => {
+  return new Date().toLocaleDateString("en-IN", {
+    timeZone: "Asia/Kolkata",
+  });
+};
+
 export default function Schedule() {
   const [tasks, setTasks] = useState<StudyTask[]>(initialTasks);
   const [selectedDate, setSelectedDate] = useState(new Date("2024-01-15"));
   const [view, setView] = useState<"week" | "day">("week");
   const [draggedTask, setDraggedTask] = useState<StudyTask | null>(null);
+  const [currentTime, setCurrentTime] = useState(getISTTime());
+
+  // Dialog states
+  const [showAddTask, setShowAddTask] = useState(false);
+  const [showFilter, setShowFilter] = useState(false);
+  const [showAutoSchedule, setShowAutoSchedule] = useState(false);
+  const [showOptimize, setShowOptimize] = useState(false);
+
+  // Form states
+  const [newTask, setNewTask] = useState({
+    title: "",
+    subject: "",
+    startTime: "09:00",
+    endTime: "10:00",
+    date: getISTDate(),
+    priority: "medium" as StudyTask["priority"],
+    type: "study" as StudyTask["type"],
+  });
+
+  const [filters, setFilters] = useState({
+    subjects: [] as string[],
+    priorities: [] as string[],
+    types: [] as string[],
+    period: "week",
+  });
+
+  const [autoScheduleSettings, setAutoScheduleSettings] = useState({
+    freeTime: 3, // hours per day
+    preferredTime: "morning",
+    breakDuration: 15, // minutes
+    sessionLength: 60, // minutes
+    subjects: [] as string[],
+  });
 
   const currentWeek = getWeekDates(selectedDate);
+
+  // Update time every minute
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(getISTTime());
+    }, 60000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const createTask = () => {
+    if (!newTask.title.trim()) return;
+
+    const task: StudyTask = {
+      id: Date.now().toString(),
+      ...newTask,
+      completed: false,
+      color: getSubjectColor(newTask.subject),
+    };
+
+    setTasks((prev) => [...prev, task]);
+    setShowAddTask(false);
+    setNewTask({
+      title: "",
+      subject: "",
+      startTime: "09:00",
+      endTime: "10:00",
+      date: getISTDate(),
+      priority: "medium",
+      type: "study",
+    });
+  };
+
+  const getSubjectColor = (subject: string) => {
+    const colors = {
+      DBMS: "bg-red-100 border-red-300 text-red-800",
+      DSA: "bg-blue-100 border-blue-300 text-blue-800",
+      OS: "bg-purple-100 border-purple-300 text-purple-800",
+      Math: "bg-green-100 border-green-300 text-green-800",
+      Networks: "bg-yellow-100 border-yellow-300 text-yellow-800",
+    };
+    return (
+      colors[subject as keyof typeof colors] ||
+      "bg-gray-100 border-gray-300 text-gray-800"
+    );
+  };
+
+  const autoScheduleTasks = () => {
+    // Simulate auto-scheduling logic
+    const pendingTasks = [
+      "Review DBMS Chapter 4",
+      "Complete DSA Assignment",
+      "OS Lab Preparation",
+    ];
+    const newAutoTasks: StudyTask[] = pendingTasks.map((title, index) => ({
+      id: `auto-${Date.now()}-${index}`,
+      title,
+      subject: index === 0 ? "DBMS" : index === 1 ? "DSA" : "OS",
+      startTime: `${9 + index * 2}:00`,
+      endTime: `${10 + index * 2}:00`,
+      date: getISTDate(),
+      priority: "medium",
+      type: "study",
+      completed: false,
+      color: getSubjectColor(index === 0 ? "DBMS" : index === 1 ? "DSA" : "OS"),
+    }));
+
+    setTasks((prev) => [...prev, ...newAutoTasks]);
+    setShowAutoSchedule(false);
+  };
+
+  const optimizeSchedule = () => {
+    // Simulate schedule optimization
+    const optimizedTasks = tasks.map((task) => {
+      // Move high priority tasks to morning hours
+      if (
+        task.priority === "high" &&
+        parseInt(task.startTime.split(":")[0]) > 12
+      ) {
+        return {
+          ...task,
+          startTime: "09:00",
+          endTime: "10:30",
+        };
+      }
+      return task;
+    });
+
+    setTasks(optimizedTasks);
+    setShowOptimize(false);
+  };
 
   function getWeekDates(date: Date) {
     const week = [];
@@ -204,16 +363,402 @@ export default function Schedule() {
             <p className="text-muted-foreground">
               Plan and organize your study sessions
             </p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Current time: {currentTime} IST
+            </p>
           </div>
           <div className="flex items-center space-x-2">
-            <Button variant="outline" size="sm">
-              <Filter className="w-4 h-4 mr-2" />
-              Filter
-            </Button>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Task
-            </Button>
+            <Dialog open={showAutoSchedule} onOpenChange={setShowAutoSchedule}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Zap className="w-4 h-4 mr-2" />
+                  Auto Schedule
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Auto Schedule Tasks</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div>
+                    <Label>Available hours per day</Label>
+                    <Input
+                      type="number"
+                      value={autoScheduleSettings.freeTime}
+                      onChange={(e) =>
+                        setAutoScheduleSettings((prev) => ({
+                          ...prev,
+                          freeTime: parseInt(e.target.value) || 3,
+                        }))
+                      }
+                      min="1"
+                      max="12"
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Preferred time</Label>
+                    <Select
+                      value={autoScheduleSettings.preferredTime}
+                      onValueChange={(value) =>
+                        setAutoScheduleSettings((prev) => ({
+                          ...prev,
+                          preferredTime: value,
+                        }))
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="morning">
+                          Morning (6-12 PM)
+                        </SelectItem>
+                        <SelectItem value="afternoon">
+                          Afternoon (12-6 PM)
+                        </SelectItem>
+                        <SelectItem value="evening">
+                          Evening (6-10 PM)
+                        </SelectItem>
+                        <SelectItem value="flexible">Flexible</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Session length (min)</Label>
+                      <Input
+                        type="number"
+                        value={autoScheduleSettings.sessionLength}
+                        onChange={(e) =>
+                          setAutoScheduleSettings((prev) => ({
+                            ...prev,
+                            sessionLength: parseInt(e.target.value) || 60,
+                          }))
+                        }
+                        min="15"
+                        max="180"
+                      />
+                    </div>
+                    <div>
+                      <Label>Break duration (min)</Label>
+                      <Input
+                        type="number"
+                        value={autoScheduleSettings.breakDuration}
+                        onChange={(e) =>
+                          setAutoScheduleSettings((prev) => ({
+                            ...prev,
+                            breakDuration: parseInt(e.target.value) || 15,
+                          }))
+                        }
+                        min="5"
+                        max="60"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end space-x-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowAutoSchedule(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button onClick={autoScheduleTasks}>
+                      <Zap className="w-4 h-4 mr-2" />
+                      Auto Schedule
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={showOptimize} onOpenChange={setShowOptimize}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Settings className="w-4 h-4 mr-2" />
+                  Optimize Schedule
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Optimize Schedule</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id="prioritize-morning" defaultChecked />
+                      <Label htmlFor="prioritize-morning">
+                        Move high priority tasks to morning
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id="balance-subjects" defaultChecked />
+                      <Label htmlFor="balance-subjects">
+                        Balance subjects across days
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id="avoid-conflicts" defaultChecked />
+                      <Label htmlFor="avoid-conflicts">
+                        Avoid time conflicts
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id="energy-levels" />
+                      <Label htmlFor="energy-levels">
+                        Consider energy levels
+                      </Label>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end space-x-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowOptimize(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button onClick={optimizeSchedule}>
+                      <Settings className="w-4 h-4 mr-2" />
+                      Optimize
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={showFilter} onOpenChange={setShowFilter}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Filter className="w-4 h-4 mr-2" />
+                  Filter
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Filter Tasks</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div>
+                    <Label>Period</Label>
+                    <Select
+                      value={filters.period}
+                      onValueChange={(value) =>
+                        setFilters((prev) => ({ ...prev, period: value }))
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="day">Today</SelectItem>
+                        <SelectItem value="week">This Week</SelectItem>
+                        <SelectItem value="month">This Month</SelectItem>
+                        <SelectItem value="all">All Tasks</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label>Subjects</Label>
+                    <div className="grid grid-cols-2 gap-2 mt-2">
+                      {["DBMS", "DSA", "OS", "Math", "Networks"].map(
+                        (subject) => (
+                          <div
+                            key={subject}
+                            className="flex items-center space-x-2"
+                          >
+                            <Checkbox
+                              id={subject}
+                              checked={filters.subjects.includes(subject)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setFilters((prev) => ({
+                                    ...prev,
+                                    subjects: [...prev.subjects, subject],
+                                  }));
+                                } else {
+                                  setFilters((prev) => ({
+                                    ...prev,
+                                    subjects: prev.subjects.filter(
+                                      (s) => s !== subject,
+                                    ),
+                                  }));
+                                }
+                              }}
+                            />
+                            <Label htmlFor={subject}>{subject}</Label>
+                          </div>
+                        ),
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end space-x-2">
+                    <Button
+                      variant="outline"
+                      onClick={() =>
+                        setFilters({
+                          subjects: [],
+                          priorities: [],
+                          types: [],
+                          period: "week",
+                        })
+                      }
+                    >
+                      Clear
+                    </Button>
+                    <Button onClick={() => setShowFilter(false)}>Apply</Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={showAddTask} onOpenChange={setShowAddTask}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Task
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add New Task</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div>
+                    <Label htmlFor="task-title">Task Title</Label>
+                    <Input
+                      id="task-title"
+                      value={newTask.title}
+                      onChange={(e) =>
+                        setNewTask((prev) => ({
+                          ...prev,
+                          title: e.target.value,
+                        }))
+                      }
+                      placeholder="e.g., Review DBMS Chapter 3"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Subject</Label>
+                      <Select
+                        value={newTask.subject}
+                        onValueChange={(value) =>
+                          setNewTask((prev) => ({ ...prev, subject: value }))
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select subject" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="DBMS">Database Systems</SelectItem>
+                          <SelectItem value="DSA">Data Structures</SelectItem>
+                          <SelectItem value="OS">Operating Systems</SelectItem>
+                          <SelectItem value="Math">Mathematics</SelectItem>
+                          <SelectItem value="Networks">Networks</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label>Type</Label>
+                      <Select
+                        value={newTask.type}
+                        onValueChange={(value: StudyTask["type"]) =>
+                          setNewTask((prev) => ({ ...prev, type: value }))
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="study">📚 Study</SelectItem>
+                          <SelectItem value="quiz">🧠 Quiz</SelectItem>
+                          <SelectItem value="review">🔄 Review</SelectItem>
+                          <SelectItem value="exam">📝 Exam</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <Label>Date</Label>
+                      <Input
+                        type="date"
+                        value={newTask.date}
+                        onChange={(e) =>
+                          setNewTask((prev) => ({
+                            ...prev,
+                            date: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                    <div>
+                      <Label>Start Time</Label>
+                      <Input
+                        type="time"
+                        value={newTask.startTime}
+                        onChange={(e) =>
+                          setNewTask((prev) => ({
+                            ...prev,
+                            startTime: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                    <div>
+                      <Label>End Time</Label>
+                      <Input
+                        type="time"
+                        value={newTask.endTime}
+                        onChange={(e) =>
+                          setNewTask((prev) => ({
+                            ...prev,
+                            endTime: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label>Priority</Label>
+                    <Select
+                      value={newTask.priority}
+                      onValueChange={(value: StudyTask["priority"]) =>
+                        setNewTask((prev) => ({ ...prev, priority: value }))
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">🟢 Low</SelectItem>
+                        <SelectItem value="medium">🟡 Medium</SelectItem>
+                        <SelectItem value="high">🔴 High</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="flex justify-end space-x-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowAddTask(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button onClick={createTask}>Create Task</Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 
