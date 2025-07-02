@@ -39,35 +39,83 @@ export default function Dashboard() {
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <TrendingUp className="w-5 h-5" />
-                  <span>Weekly Progress</span>
+                  <span>Subject Progress</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span>DBMS</span>
-                    <span>85%</span>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center">
+                    <div className="relative">
+                      <svg className="w-16 h-16 mx-auto">
+                        <circle
+                          cx="32"
+                          cy="32"
+                          r="28"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                          fill="none"
+                          className="text-muted"
+                        />
+                        <circle
+                          cx="32"
+                          cy="32"
+                          r="28"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                          fill="none"
+                          strokeDasharray={`${85 * 1.76} 176`}
+                          strokeLinecap="round"
+                          className="text-red-500 transform -rotate-90 origin-center"
+                        />
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-sm font-bold">85%</span>
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">DBMS</p>
                   </div>
-                  <Progress value={85} className="h-2" />
+                  <div className="text-center">
+                    <div className="relative">
+                      <svg className="w-16 h-16 mx-auto">
+                        <circle
+                          cx="32"
+                          cy="32"
+                          r="28"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                          fill="none"
+                          className="text-muted"
+                        />
+                        <circle
+                          cx="32"
+                          cy="32"
+                          r="28"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                          fill="none"
+                          strokeDasharray={`${67 * 1.76} 176`}
+                          strokeLinecap="round"
+                          className="text-blue-500 transform -rotate-90 origin-center"
+                        />
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-sm font-bold">67%</span>
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">DSA</p>
+                  </div>
                 </div>
                 <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span>Data Structures</span>
-                    <span>67%</span>
-                  </div>
-                  <Progress value={67} className="h-2" />
-                </div>
-                <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span>Operating Systems</span>
-                    <span>42%</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Operating Systems</span>
+                    <span className="text-sm font-medium">42%</span>
                   </div>
                   <Progress value={42} className="h-2" />
                 </div>
                 <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span>Mathematics</span>
-                    <span>78%</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Mathematics</span>
+                    <span className="text-sm font-medium">78%</span>
                   </div>
                   <Progress value={78} className="h-2" />
                 </div>
