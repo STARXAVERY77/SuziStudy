@@ -3,6 +3,25 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState, useEffect } from "react";
 import {
   RotateCcw,
@@ -23,6 +42,9 @@ import {
   Shuffle,
   Filter,
   Plus,
+  Calendar,
+  Settings,
+  BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -135,6 +157,14 @@ const sampleFlashcards: Flashcard[] = [
   },
 ];
 
+// IST time helpers
+const getISTTime = () => {
+  return new Date().toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata",
+    hour12: false,
+  });
+};
+
 export default function Flashcards() {
   const [flashcards, setFlashcards] = useState<Flashcard[]>(sampleFlashcards);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
@@ -152,8 +182,130 @@ export default function Flashcards() {
   const [currentSession, setCurrentSession] = useState<StudySession | null>(
     null,
   );
+  const [currentTime, setCurrentTime] = useState(getISTTime());
+
+  // Dialog states
+  const [showCreateCard, setShowCreateCard] = useState(false);
+  const [showAIGenerate, setShowAIGenerate] = useState(false);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
+
+  // Form states
+  const [newCard, setNewCard] = useState({
+    front: "",
+    back: "",
+    subject: "",
+    topic: "",
+    difficulty: 3 as Flashcard["difficulty"],
+    tags: "",
+  });
+
+  const [aiGenerateSettings, setAIGenerateSettings] = useState({
+    subject: "",
+    topic: "",
+    count: 5,
+    difficulty: "mixed",
+    source: "textbook",
+  });
+
+  const [advancedFilters, setAdvancedFilters] = useState({
+    difficultyRange: [1, 5],
+    memoryStrength: [0, 100],
+    reviewStatus: "all",
+    tags: [] as string[],
+    dateRange: "all",
+  });
 
   const subjects = ["All", "DBMS", "DSA", "OS", "Math"];
+
+  // Update time every minute
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(getISTTime());
+    }, 60000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const createCard = () => {
+    if (!newCard.front.trim() || !newCard.back.trim()) return;
+
+    const card: Flashcard = {
+      id: Date.now().toString(),
+      front: newCard.front,
+      back: newCard.back,
+      subject: newCard.subject,
+      topic: newCard.topic,
+      difficulty: newCard.difficulty,
+      interval: 1,
+      nextReview: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      reviews: [],
+      tags: newCard.tags
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter(Boolean),
+      createdAt: new Date(),
+      aiGenerated: false,
+      memoryStrength: 0,
+    };
+
+    setFlashcards((prev) => [card, ...prev]);
+    setShowCreateCard(false);
+    setNewCard({
+      front: "",
+      back: "",
+      subject: "",
+      topic: "",
+      difficulty: 3,
+      tags: "",
+    });
+  };
+
+  const generateAICards = () => {
+    // Simulate AI card generation
+    const aiCards: Flashcard[] = Array.from(
+      { length: aiGenerateSettings.count },
+      (_, i) => ({
+        id: `ai-${Date.now()}-${i}`,
+        front: `AI Generated Question ${i + 1} about ${aiGenerateSettings.topic}`,
+        back: `AI Generated Answer ${i + 1} explaining the concept in detail.`,
+        subject: aiGenerateSettings.subject,
+        topic: aiGenerateSettings.topic,
+        difficulty: (Math.floor(Math.random() * 5) +
+          1) as Flashcard["difficulty"],
+        interval: 1,
+        nextReview: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        reviews: [],
+        tags: ["ai-generated", aiGenerateSettings.topic.toLowerCase()],
+        createdAt: new Date(),
+        aiGenerated: true,
+        memoryStrength: 0,
+      }),
+    );
+
+    setFlashcards((prev) => [...aiCards, ...prev]);
+    setShowAIGenerate(false);
+  };
+
+  const shuffleCards = () => {
+    const shuffled = [...filteredCards].sort(() => Math.random() - 0.5);
+    setFlashcards((prev) => {
+      const others = prev.filter((card) => !filteredCards.includes(card));
+      return [...shuffled, ...others];
+    });
+    setCurrentCardIndex(0);
+  };
+
+  const resetProgress = () => {
+    setFlashcards((prev) =>
+      prev.map((card) => ({
+        ...card,
+        interval: 1,
+        nextReview: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        reviews: [],
+        memoryStrength: 0,
+      })),
+    );
+  };
 
   const filteredCards = flashcards.filter((card) => {
     if (!selectedSubject || selectedSubject === "All") return true;
@@ -294,16 +446,284 @@ export default function Flashcards() {
             <p className="text-muted-foreground">
               Spaced repetition learning with AI-generated content
             </p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Current time: {currentTime} IST
+            </p>
           </div>
           <div className="flex items-center space-x-2">
-            <Button variant="outline">
-              <Plus className="w-4 h-4 mr-2" />
-              Create Cards
-            </Button>
-            <Button variant="outline">
-              <Zap className="w-4 h-4 mr-2" />
-              AI Generate
-            </Button>
+            <Dialog open={showCreateCard} onOpenChange={setShowCreateCard}>
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Cards
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create New Flashcard</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div>
+                    <Label htmlFor="front">Front (Question)</Label>
+                    <Textarea
+                      id="front"
+                      value={newCard.front}
+                      onChange={(e) =>
+                        setNewCard((prev) => ({
+                          ...prev,
+                          front: e.target.value,
+                        }))
+                      }
+                      placeholder="Enter the question or prompt..."
+                      rows={3}
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="back">Back (Answer)</Label>
+                    <Textarea
+                      id="back"
+                      value={newCard.back}
+                      onChange={(e) =>
+                        setNewCard((prev) => ({
+                          ...prev,
+                          back: e.target.value,
+                        }))
+                      }
+                      placeholder="Enter the answer or explanation..."
+                      rows={4}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Subject</Label>
+                      <Select
+                        value={newCard.subject}
+                        onValueChange={(value) =>
+                          setNewCard((prev) => ({ ...prev, subject: value }))
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select subject" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="DBMS">Database Systems</SelectItem>
+                          <SelectItem value="DSA">Data Structures</SelectItem>
+                          <SelectItem value="OS">Operating Systems</SelectItem>
+                          <SelectItem value="Math">Mathematics</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label>Topic</Label>
+                      <Input
+                        value={newCard.topic}
+                        onChange={(e) =>
+                          setNewCard((prev) => ({
+                            ...prev,
+                            topic: e.target.value,
+                          }))
+                        }
+                        placeholder="e.g., Normalization"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Difficulty (1-5)</Label>
+                      <Select
+                        value={newCard.difficulty.toString()}
+                        onValueChange={(value) =>
+                          setNewCard((prev) => ({
+                            ...prev,
+                            difficulty: parseInt(
+                              value,
+                            ) as Flashcard["difficulty"],
+                          }))
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1">1 - Very Easy</SelectItem>
+                          <SelectItem value="2">2 - Easy</SelectItem>
+                          <SelectItem value="3">3 - Medium</SelectItem>
+                          <SelectItem value="4">4 - Hard</SelectItem>
+                          <SelectItem value="5">5 - Very Hard</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label>Tags (comma-separated)</Label>
+                      <Input
+                        value={newCard.tags}
+                        onChange={(e) =>
+                          setNewCard((prev) => ({
+                            ...prev,
+                            tags: e.target.value,
+                          }))
+                        }
+                        placeholder="theory, fundamentals, important"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end space-x-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowCreateCard(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button onClick={createCard}>Create Card</Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={showAIGenerate} onOpenChange={setShowAIGenerate}>
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  <Zap className="w-4 h-4 mr-2" />
+                  AI Generate
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>AI Generate Flashcards</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Subject</Label>
+                      <Select
+                        value={aiGenerateSettings.subject}
+                        onValueChange={(value) =>
+                          setAIGenerateSettings((prev) => ({
+                            ...prev,
+                            subject: value,
+                          }))
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select subject" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="DBMS">Database Systems</SelectItem>
+                          <SelectItem value="DSA">Data Structures</SelectItem>
+                          <SelectItem value="OS">Operating Systems</SelectItem>
+                          <SelectItem value="Math">Mathematics</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label>Topic</Label>
+                      <Input
+                        value={aiGenerateSettings.topic}
+                        onChange={(e) =>
+                          setAIGenerateSettings((prev) => ({
+                            ...prev,
+                            topic: e.target.value,
+                          }))
+                        }
+                        placeholder="e.g., Binary Trees"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Number of Cards</Label>
+                      <Input
+                        type="number"
+                        value={aiGenerateSettings.count}
+                        onChange={(e) =>
+                          setAIGenerateSettings((prev) => ({
+                            ...prev,
+                            count: parseInt(e.target.value) || 5,
+                          }))
+                        }
+                        min="1"
+                        max="20"
+                      />
+                    </div>
+
+                    <div>
+                      <Label>Difficulty</Label>
+                      <Select
+                        value={aiGenerateSettings.difficulty}
+                        onValueChange={(value) =>
+                          setAIGenerateSettings((prev) => ({
+                            ...prev,
+                            difficulty: value,
+                          }))
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="easy">Easy</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="hard">Hard</SelectItem>
+                          <SelectItem value="mixed">Mixed</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label>Source</Label>
+                    <Select
+                      value={aiGenerateSettings.source}
+                      onValueChange={(value) =>
+                        setAIGenerateSettings((prev) => ({
+                          ...prev,
+                          source: value,
+                        }))
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="textbook">
+                          Textbook Concepts
+                        </SelectItem>
+                        <SelectItem value="practice">
+                          Practice Problems
+                        </SelectItem>
+                        <SelectItem value="theory">
+                          Theoretical Questions
+                        </SelectItem>
+                        <SelectItem value="application">
+                          Real-world Applications
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="flex justify-end space-x-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowAIGenerate(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button onClick={generateAICards}>
+                      <Brain className="w-4 h-4 mr-2" />
+                      Generate Cards
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 
@@ -742,6 +1162,7 @@ export default function Flashcards() {
                   variant="outline"
                   size="sm"
                   className="w-full justify-start"
+                  onClick={shuffleCards}
                 >
                   <Shuffle className="w-4 h-4 mr-2" />
                   Shuffle Cards
@@ -750,26 +1171,181 @@ export default function Flashcards() {
                   variant="outline"
                   size="sm"
                   className="w-full justify-start"
+                  onClick={resetProgress}
                 >
                   <RotateCcw className="w-4 h-4 mr-2" />
                   Reset Progress
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full justify-start"
+
+                <Dialog open={showAnalytics} onOpenChange={setShowAnalytics}>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full justify-start"
+                    >
+                      <BarChart3 className="w-4 h-4 mr-2" />
+                      View Analytics
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle>Flashcard Analytics</DialogTitle>
+                    </DialogHeader>
+                    <Tabs defaultValue="overview" className="w-full">
+                      <TabsList className="grid w-full grid-cols-3">
+                        <TabsTrigger value="overview">Overview</TabsTrigger>
+                        <TabsTrigger value="performance">
+                          Performance
+                        </TabsTrigger>
+                        <TabsTrigger value="progress">Progress</TabsTrigger>
+                      </TabsList>
+
+                      <TabsContent value="overview" className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="text-center p-4 border rounded-lg">
+                            <div className="text-2xl font-bold">
+                              {flashcards.length}
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              Total Cards
+                            </div>
+                          </div>
+                          <div className="text-center p-4 border rounded-lg">
+                            <div className="text-2xl font-bold">
+                              {sessionStats.cardsStudied}
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              Cards Studied Today
+                            </div>
+                          </div>
+                        </div>
+                      </TabsContent>
+
+                      <TabsContent value="performance">
+                        <div className="text-center py-8 text-muted-foreground">
+                          Performance analytics would be displayed here
+                        </div>
+                      </TabsContent>
+
+                      <TabsContent value="progress">
+                        <div className="text-center py-8 text-muted-foreground">
+                          Progress tracking would be shown here
+                        </div>
+                      </TabsContent>
+                    </Tabs>
+                  </DialogContent>
+                </Dialog>
+
+                <Dialog
+                  open={showAdvancedFilters}
+                  onOpenChange={setShowAdvancedFilters}
                 >
-                  <BarChart3 className="w-4 h-4 mr-2" />
-                  View Analytics
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full justify-start"
-                >
-                  <Filter className="w-4 h-4 mr-2" />
-                  Advanced Filters
-                </Button>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full justify-start"
+                    >
+                      <Filter className="w-4 h-4 mr-2" />
+                      Advanced Filters
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Advanced Filters</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div>
+                        <Label>Review Status</Label>
+                        <Select
+                          value={advancedFilters.reviewStatus}
+                          onValueChange={(value) =>
+                            setAdvancedFilters((prev) => ({
+                              ...prev,
+                              reviewStatus: value,
+                            }))
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Cards</SelectItem>
+                            <SelectItem value="due">Due for Review</SelectItem>
+                            <SelectItem value="new">New Cards</SelectItem>
+                            <SelectItem value="learned">
+                              Well Learned
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <Label>Memory Strength Range (0-100%)</Label>
+                        <div className="text-center text-sm text-muted-foreground mt-2">
+                          {advancedFilters.memoryStrength[0]}% -{" "}
+                          {advancedFilters.memoryStrength[1]}%
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label>Tags</Label>
+                        <div className="grid grid-cols-2 gap-2 mt-2 max-h-32 overflow-y-auto">
+                          {Array.from(
+                            new Set(flashcards.flatMap((card) => card.tags)),
+                          ).map((tag) => (
+                            <div
+                              key={tag}
+                              className="flex items-center space-x-2"
+                            >
+                              <Checkbox
+                                id={tag}
+                                checked={advancedFilters.tags.includes(tag)}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    setAdvancedFilters((prev) => ({
+                                      ...prev,
+                                      tags: [...prev.tags, tag],
+                                    }));
+                                  } else {
+                                    setAdvancedFilters((prev) => ({
+                                      ...prev,
+                                      tags: prev.tags.filter((t) => t !== tag),
+                                    }));
+                                  }
+                                }}
+                              />
+                              <Label htmlFor={tag} className="text-sm">
+                                {tag}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end space-x-2">
+                        <Button
+                          variant="outline"
+                          onClick={() =>
+                            setAdvancedFilters({
+                              difficultyRange: [1, 5],
+                              memoryStrength: [0, 100],
+                              reviewStatus: "all",
+                              tags: [],
+                              dateRange: "all",
+                            })
+                          }
+                        >
+                          Clear
+                        </Button>
+                        <Button onClick={() => setShowAdvancedFilters(false)}>
+                          Apply
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </CardContent>
             </Card>
           </div>

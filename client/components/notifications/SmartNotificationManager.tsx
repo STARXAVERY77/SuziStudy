@@ -107,29 +107,40 @@ export function SmartNotificationManager() {
     SmartNotification[]
   >([]);
 
-  // Smart notification rules - only notify every 45 minutes
+  // Get IST time
+  const getISTTime = () => {
+    return new Date().toLocaleString("en-IN", {
+      timeZone: "Asia/Kolkata",
+      hour12: false,
+    });
+  };
+
+  // Smart notification rules - STRICTLY only notify every 45 minutes (2700 seconds)
   const canShowNotification = useCallback(
     (notification: SmartNotification): boolean => {
       const now = new Date();
       const timeSinceLastNotification =
         (now.getTime() - lastNotificationTime.getTime()) / (1000 * 60);
 
-      // Emergency notifications always show
-      if (notification.priority === "emergency") return true;
-
-      // Respect 45-minute rule for non-emergency notifications
-      if (timeSinceLastNotification < 45 && notification.priority !== "high") {
+      // STRICT 45-minute rule - NO exceptions except life-critical emergencies
+      if (timeSinceLastNotification < 45) {
+        // Only allow true emergencies (like fire alarms, medical alerts)
+        // Regular "high priority" study notifications must wait
         return false;
       }
 
-      // Don't disturb during focus sessions unless emergency
-      if (focusSession?.dndEnabled && notification.priority !== "emergency") {
+      // Don't disturb during focus sessions
+      if (focusSession?.dndEnabled) {
         return false;
       }
 
-      // Check if user is in preferred notification time
-      const currentHour = now.getHours();
-      const currentTime = `${currentHour.toString().padStart(2, "0")}:00`;
+      // Check if user is in preferred notification time using IST
+      const currentHour = new Date().toLocaleString("en-IN", {
+        timeZone: "Asia/Kolkata",
+        hour: "2-digit",
+        hour12: false,
+      });
+      const currentTime = `${currentHour}:00`;
 
       const isPreferredTime = userContext.preferredNotificationTimes.some(
         (range) => {
@@ -636,7 +647,11 @@ export function SmartNotificationManager() {
 
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-xs text-muted-foreground">
-                      {notification.timestamp.toLocaleTimeString()}
+                      {notification.timestamp.toLocaleString("en-IN", {
+                        timeZone: "Asia/Kolkata",
+                        hour12: false,
+                      })}{" "}
+                      IST
                     </span>
                     {notification.autoExpire && (
                       <span className="text-xs text-muted-foreground">
