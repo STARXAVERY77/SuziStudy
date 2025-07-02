@@ -206,7 +206,7 @@ export default function Schedule() {
       color: getSubjectColor(newTask.subject),
     };
 
-    setTasks((prev) => [...prev, task]);
+    setTasks(prev => [...prev, task]);
     setShowAddTask(false);
     setNewTask({
       title: "",
@@ -221,25 +221,18 @@ export default function Schedule() {
 
   const getSubjectColor = (subject: string) => {
     const colors = {
-      DBMS: "bg-red-100 border-red-300 text-red-800",
-      DSA: "bg-blue-100 border-blue-300 text-blue-800",
-      OS: "bg-purple-100 border-purple-300 text-purple-800",
-      Math: "bg-green-100 border-green-300 text-green-800",
-      Networks: "bg-yellow-100 border-yellow-300 text-yellow-800",
+      "DBMS": "bg-red-100 border-red-300 text-red-800",
+      "DSA": "bg-blue-100 border-blue-300 text-blue-800",
+      "OS": "bg-purple-100 border-purple-300 text-purple-800",
+      "Math": "bg-green-100 border-green-300 text-green-800",
+      "Networks": "bg-yellow-100 border-yellow-300 text-yellow-800",
     };
-    return (
-      colors[subject as keyof typeof colors] ||
-      "bg-gray-100 border-gray-300 text-gray-800"
-    );
+    return colors[subject as keyof typeof colors] || "bg-gray-100 border-gray-300 text-gray-800";
   };
 
   const autoScheduleTasks = () => {
     // Simulate auto-scheduling logic
-    const pendingTasks = [
-      "Review DBMS Chapter 4",
-      "Complete DSA Assignment",
-      "OS Lab Preparation",
-    ];
+    const pendingTasks = ["Review DBMS Chapter 4", "Complete DSA Assignment", "OS Lab Preparation"];
     const newAutoTasks: StudyTask[] = pendingTasks.map((title, index) => ({
       id: `auto-${Date.now()}-${index}`,
       title,
@@ -253,18 +246,15 @@ export default function Schedule() {
       color: getSubjectColor(index === 0 ? "DBMS" : index === 1 ? "DSA" : "OS"),
     }));
 
-    setTasks((prev) => [...prev, ...newAutoTasks]);
+    setTasks(prev => [...prev, ...newAutoTasks]);
     setShowAutoSchedule(false);
   };
 
   const optimizeSchedule = () => {
     // Simulate schedule optimization
-    const optimizedTasks = tasks.map((task) => {
+    const optimizedTasks = tasks.map(task => {
       // Move high priority tasks to morning hours
-      if (
-        task.priority === "high" &&
-        parseInt(task.startTime.split(":")[0]) > 12
-      ) {
+      if (task.priority === "high" && parseInt(task.startTime.split(":")[0]) > 12) {
         return {
           ...task,
           startTime: "09:00",
@@ -357,13 +347,13 @@ export default function Schedule() {
     <AppLayout>
       <div className="p-6 space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold">Study Schedule</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl lg:text-3xl font-bold">Study Schedule</h1>
+            <p className="text-sm lg:text-base text-muted-foreground">
               Plan and organize your study sessions
             </p>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-xs lg:text-sm text-muted-foreground mt-1">
               Current time: {currentTime} IST
             </p>
           </div>
@@ -385,12 +375,9 @@ export default function Schedule() {
                     <Input
                       type="number"
                       value={autoScheduleSettings.freeTime}
-                      onChange={(e) =>
-                        setAutoScheduleSettings((prev) => ({
-                          ...prev,
-                          freeTime: parseInt(e.target.value) || 3,
-                        }))
-                      }
+                      onChange={(e) => setAutoScheduleSettings(prev => ({
+                        ...prev, freeTime: parseInt(e.target.value) || 3
+                      }))}
                       min="1"
                       max="12"
                     />
@@ -400,26 +387,17 @@ export default function Schedule() {
                     <Label>Preferred time</Label>
                     <Select
                       value={autoScheduleSettings.preferredTime}
-                      onValueChange={(value) =>
-                        setAutoScheduleSettings((prev) => ({
-                          ...prev,
-                          preferredTime: value,
-                        }))
-                      }
+                      onValueChange={(value) => setAutoScheduleSettings(prev => ({
+                        ...prev, preferredTime: value
+                      }))}
                     >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="morning">
-                          Morning (6-12 PM)
-                        </SelectItem>
-                        <SelectItem value="afternoon">
-                          Afternoon (12-6 PM)
-                        </SelectItem>
-                        <SelectItem value="evening">
-                          Evening (6-10 PM)
-                        </SelectItem>
+                        <SelectItem value="morning">Morning (6-12 PM)</SelectItem>
+                        <SelectItem value="afternoon">Afternoon (12-6 PM)</SelectItem>
+                        <SelectItem value="evening">Evening (6-10 PM)</SelectItem>
                         <SelectItem value="flexible">Flexible</SelectItem>
                       </SelectContent>
                     </Select>
@@ -431,12 +409,9 @@ export default function Schedule() {
                       <Input
                         type="number"
                         value={autoScheduleSettings.sessionLength}
-                        onChange={(e) =>
-                          setAutoScheduleSettings((prev) => ({
-                            ...prev,
-                            sessionLength: parseInt(e.target.value) || 60,
-                          }))
-                        }
+                        onChange={(e) => setAutoScheduleSettings(prev => ({
+                          ...prev, sessionLength: parseInt(e.target.value) || 60
+                        }))}
                         min="15"
                         max="180"
                       />
@@ -446,12 +421,9 @@ export default function Schedule() {
                       <Input
                         type="number"
                         value={autoScheduleSettings.breakDuration}
-                        onChange={(e) =>
-                          setAutoScheduleSettings((prev) => ({
-                            ...prev,
-                            breakDuration: parseInt(e.target.value) || 15,
-                          }))
-                        }
+                        onChange={(e) => setAutoScheduleSettings(prev => ({
+                          ...prev, breakDuration: parseInt(e.target.value) || 15
+                        }))}
                         min="5"
                         max="60"
                       />
@@ -459,10 +431,7 @@ export default function Schedule() {
                   </div>
 
                   <div className="flex justify-end space-x-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => setShowAutoSchedule(false)}
-                    >
+                    <Button variant="outline" onClick={() => setShowAutoSchedule(false)}>
                       Cancel
                     </Button>
                     <Button onClick={autoScheduleTasks}>
@@ -489,35 +458,24 @@ export default function Schedule() {
                   <div className="space-y-3">
                     <div className="flex items-center space-x-2">
                       <Checkbox id="prioritize-morning" defaultChecked />
-                      <Label htmlFor="prioritize-morning">
-                        Move high priority tasks to morning
-                      </Label>
+                      <Label htmlFor="prioritize-morning">Move high priority tasks to morning</Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Checkbox id="balance-subjects" defaultChecked />
-                      <Label htmlFor="balance-subjects">
-                        Balance subjects across days
-                      </Label>
+                      <Label htmlFor="balance-subjects">Balance subjects across days</Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Checkbox id="avoid-conflicts" defaultChecked />
-                      <Label htmlFor="avoid-conflicts">
-                        Avoid time conflicts
-                      </Label>
+                      <Label htmlFor="avoid-conflicts">Avoid time conflicts</Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Checkbox id="energy-levels" />
-                      <Label htmlFor="energy-levels">
-                        Consider energy levels
-                      </Label>
+                      <Label htmlFor="energy-levels">Consider energy levels</Label>
                     </div>
                   </div>
 
                   <div className="flex justify-end space-x-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => setShowOptimize(false)}
-                    >
+                    <Button variant="outline" onClick={() => setShowOptimize(false)}>
                       Cancel
                     </Button>
                     <Button onClick={optimizeSchedule}>
@@ -543,12 +501,8 @@ export default function Schedule() {
                 <div className="space-y-4 py-4">
                   <div>
                     <Label>Period</Label>
-                    <Select
-                      value={filters.period}
-                      onValueChange={(value) =>
-                        setFilters((prev) => ({ ...prev, period: value }))
-                      }
-                    >
+                    <Select value={filters.period} onValueChange={(value) =>
+                      setFilters(prev => ({ ...prev, period: value }))}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -564,53 +518,38 @@ export default function Schedule() {
                   <div>
                     <Label>Subjects</Label>
                     <div className="grid grid-cols-2 gap-2 mt-2">
-                      {["DBMS", "DSA", "OS", "Math", "Networks"].map(
-                        (subject) => (
-                          <div
-                            key={subject}
-                            className="flex items-center space-x-2"
-                          >
-                            <Checkbox
-                              id={subject}
-                              checked={filters.subjects.includes(subject)}
-                              onCheckedChange={(checked) => {
-                                if (checked) {
-                                  setFilters((prev) => ({
-                                    ...prev,
-                                    subjects: [...prev.subjects, subject],
-                                  }));
-                                } else {
-                                  setFilters((prev) => ({
-                                    ...prev,
-                                    subjects: prev.subjects.filter(
-                                      (s) => s !== subject,
-                                    ),
-                                  }));
-                                }
-                              }}
-                            />
-                            <Label htmlFor={subject}>{subject}</Label>
-                          </div>
-                        ),
-                      )}
+                      {["DBMS", "DSA", "OS", "Math", "Networks"].map((subject) => (
+                        <div key={subject} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={subject}
+                            checked={filters.subjects.includes(subject)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setFilters(prev => ({
+                                  ...prev, subjects: [...prev.subjects, subject]
+                                }));
+                              } else {
+                                setFilters(prev => ({
+                                  ...prev, subjects: prev.subjects.filter(s => s !== subject)
+                                }));
+                              }
+                            }}
+                          />
+                          <Label htmlFor={subject}>{subject}</Label>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
                   <div className="flex justify-end space-x-2">
-                    <Button
-                      variant="outline"
-                      onClick={() =>
-                        setFilters({
-                          subjects: [],
-                          priorities: [],
-                          types: [],
-                          period: "week",
-                        })
-                      }
-                    >
+                    <Button variant="outline" onClick={() => setFilters({
+                      subjects: [], priorities: [], types: [], period: "week"
+                    })}>
                       Clear
                     </Button>
-                    <Button onClick={() => setShowFilter(false)}>Apply</Button>
+                    <Button onClick={() => setShowFilter(false)}>
+                      Apply
+                    </Button>
                   </div>
                 </div>
               </DialogContent>
@@ -633,12 +572,7 @@ export default function Schedule() {
                     <Input
                       id="task-title"
                       value={newTask.title}
-                      onChange={(e) =>
-                        setNewTask((prev) => ({
-                          ...prev,
-                          title: e.target.value,
-                        }))
-                      }
+                      onChange={(e) => setNewTask(prev => ({ ...prev, title: e.target.value }))}
                       placeholder="e.g., Review DBMS Chapter 3"
                     />
                   </div>
@@ -646,12 +580,8 @@ export default function Schedule() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label>Subject</Label>
-                      <Select
-                        value={newTask.subject}
-                        onValueChange={(value) =>
-                          setNewTask((prev) => ({ ...prev, subject: value }))
-                        }
-                      >
+                      <Select value={newTask.subject} onValueChange={(value) =>
+                        setNewTask(prev => ({ ...prev, subject: value }))}>
                         <SelectTrigger>
                           <SelectValue placeholder="Select subject" />
                         </SelectTrigger>
@@ -667,12 +597,8 @@ export default function Schedule() {
 
                     <div>
                       <Label>Type</Label>
-                      <Select
-                        value={newTask.type}
-                        onValueChange={(value: StudyTask["type"]) =>
-                          setNewTask((prev) => ({ ...prev, type: value }))
-                        }
-                      >
+                      <Select value={newTask.type} onValueChange={(value: StudyTask["type"]) =>
+                        setNewTask(prev => ({ ...prev, type: value }))}>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
@@ -692,12 +618,7 @@ export default function Schedule() {
                       <Input
                         type="date"
                         value={newTask.date}
-                        onChange={(e) =>
-                          setNewTask((prev) => ({
-                            ...prev,
-                            date: e.target.value,
-                          }))
-                        }
+                        onChange={(e) => setNewTask(prev => ({ ...prev, date: e.target.value }))}
                       />
                     </div>
                     <div>
@@ -705,12 +626,7 @@ export default function Schedule() {
                       <Input
                         type="time"
                         value={newTask.startTime}
-                        onChange={(e) =>
-                          setNewTask((prev) => ({
-                            ...prev,
-                            startTime: e.target.value,
-                          }))
-                        }
+                        onChange={(e) => setNewTask(prev => ({ ...prev, startTime: e.target.value }))}
                       />
                     </div>
                     <div>
@@ -718,24 +634,15 @@ export default function Schedule() {
                       <Input
                         type="time"
                         value={newTask.endTime}
-                        onChange={(e) =>
-                          setNewTask((prev) => ({
-                            ...prev,
-                            endTime: e.target.value,
-                          }))
-                        }
+                        onChange={(e) => setNewTask(prev => ({ ...prev, endTime: e.target.value }))}
                       />
                     </div>
                   </div>
 
                   <div>
                     <Label>Priority</Label>
-                    <Select
-                      value={newTask.priority}
-                      onValueChange={(value: StudyTask["priority"]) =>
-                        setNewTask((prev) => ({ ...prev, priority: value }))
-                      }
-                    >
+                    <Select value={newTask.priority} onValueChange={(value: StudyTask["priority"]) =>
+                      setNewTask(prev => ({ ...prev, priority: value }))}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -748,13 +655,12 @@ export default function Schedule() {
                   </div>
 
                   <div className="flex justify-end space-x-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => setShowAddTask(false)}
-                    >
+                    <Button variant="outline" onClick={() => setShowAddTask(false)}>
                       Cancel
                     </Button>
-                    <Button onClick={createTask}>Create Task</Button>
+                    <Button onClick={createTask}>
+                      Create Task
+                    </Button>
                   </div>
                 </div>
               </DialogContent>
@@ -816,24 +722,75 @@ export default function Schedule() {
         {/* Calendar Grid */}
         <Card>
           <CardContent className="p-0">
-            <div className="grid grid-cols-8 border-b">
-              <div className="p-3 border-r bg-muted/50">
-                <span className="text-sm font-medium">Time</span>
-              </div>
-              {currentWeek.map((date, index) => (
-                <div
-                  key={index}
-                  className="p-3 text-center border-r last:border-r-0"
-                >
-                  <div className="text-sm font-medium">{weekDays[index]}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {date.getDate()}
-                  </div>
+            {/* Mobile: Show only current day */}
+            <div className="lg:hidden">
+              <div className="flex items-center justify-between p-4 border-b">
+                <h3 className="font-medium">Today's Schedule</h3>
+                <div className="text-sm text-muted-foreground">
+                  {new Date().toLocaleDateString('en-IN', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric'
+                  })}
                 </div>
-              ))}
+              </div>
+              <div className="space-y-2 p-4">
+                {getTasksForDate(new Date("2024-01-15")).map((task) => {
+                  const TaskIcon = getTypeIcon(task.type);
+                  return (
+                    <div
+                      key={task.id}
+                      className={cn(
+                        "p-3 rounded-lg border-l-4",
+                        task.color,
+                        task.completed && "opacity-60",
+                      )}
+                    >
+                      <div className="flex items-center space-x-2 mb-1">
+                        <TaskIcon className="w-4 h-4" />
+                        <span className="font-medium text-sm">{task.title}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>{task.startTime}-{task.endTime}</span>
+                        <Badge
+                          variant={
+                            task.priority === "high"
+                              ? "destructive"
+                              : task.priority === "medium"
+                                ? "default"
+                                : "secondary"
+                          }
+                          className="text-xs"
+                        >
+                          {task.priority}
+                        </Badge>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
-            <div className="max-h-96 overflow-y-auto">
+            {/* Desktop: Full week grid */}
+            <div className="hidden lg:block">
+              <div className="grid grid-cols-8 border-b">
+                <div className="p-3 border-r bg-muted/50">
+                  <span className="text-sm font-medium">Time</span>
+                </div>
+                {currentWeek.map((date, index) => (
+                  <div
+                    key={index}
+                    className="p-3 text-center border-r last:border-r-0"
+                  >
+                    <div className="text-sm font-medium">{weekDays[index]}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {date.getDate()}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="max-h-96 overflow-y-auto">
               {timeSlots.map((timeSlot) => (
                 <div key={timeSlot} className="grid grid-cols-8 border-b">
                   <div className="p-3 border-r bg-muted/50 text-sm font-medium">
@@ -897,11 +854,11 @@ export default function Schedule() {
         </Card>
 
         {/* Today's Tasks Summary */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
           <div className="lg:col-span-2">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
+                <CardTitle className="flex items-center space-x-2 text-lg lg:text-xl">
                   <Clock className="w-5 h-5" />
                   <span>Today's Tasks</span>
                 </CardTitle>
