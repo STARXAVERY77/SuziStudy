@@ -433,7 +433,14 @@ export default function Materials() {
                           AI Extracted Content
                         </span>
                       </div>
-                      <p className="text-xs text-muted-foreground line-clamp-2">
+                      <p
+                        className="text-xs text-muted-foreground overflow-hidden text-ellipsis"
+                        style={{
+                          display: "-webkit-box",
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: "vertical",
+                        }}
+                      >
                         {material.ocrText}
                       </p>
                     </div>

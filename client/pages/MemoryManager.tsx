@@ -524,7 +524,14 @@ export default function MemoryManager() {
                           </div>
                         </div>
 
-                        <p className="text-sm mb-3 line-clamp-2">
+                        <p
+                          className="text-sm mb-3 overflow-hidden text-ellipsis"
+                          style={{
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                          }}
+                        >
                           {memory.isEncrypted
                             ? "🔒 Encrypted content"
                             : memory.content}
