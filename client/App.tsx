@@ -23,6 +23,7 @@ import SmartScheduler from "./pages/SmartScheduler";
 import MemoryManager from "./pages/MemoryManager";
 import DocumentAnalysis from "./pages/DocumentAnalysis";
 import VideoLearning from "./pages/VideoLearning";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import { PlaceholderPage } from "./pages/PlaceholderPage";
 import { Target, Settings } from "lucide-react";
@@ -54,6 +55,7 @@ const App = () => (
           <Route path="/memory" element={<MemoryManager />} />
           <Route path="/documents" element={<DocumentAnalysis />} />
           <Route path="/video-learning" element={<VideoLearning />} />
+          <Route path="/settings" element={<Settings />} />
           <Route
             path="/goals"
             element={
