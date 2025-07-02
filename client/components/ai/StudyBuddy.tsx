@@ -27,8 +27,8 @@ export function StudyBuddy() {
             </Button>
           </div>
           <div className="text-sm text-muted-foreground mb-3">
-            Hey there! 👋 Ready to crush your study goals today? I'm here to
-            help you stay focused and motivated!
+            Hey Alex! 👋 You're doing great with your 7-day streak! Ready to
+            tackle your DBMS review today? I'm here to help!
           </div>
           <div className="flex space-x-2">
             <Button size="sm" variant="outline" className="text-xs">
