@@ -4,6 +4,24 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
 import {
   Code,
@@ -22,6 +40,12 @@ import {
   BookOpen,
   Award,
   Flame,
+  Plus,
+  X,
+  PieChart,
+  LineChart,
+  Users,
+  Timer,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -225,6 +249,39 @@ export default function LeetCode() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPlan, setSelectedPlan] = useState("striver-sde");
 
+  // Dialog states
+  const [scheduleDialogOpen, setScheduleDialogOpen] = useState(false);
+  const [goalDialogOpen, setGoalDialogOpen] = useState(false);
+  const [analyticsDialogOpen, setAnalyticsDialogOpen] = useState(false);
+  const [filtersDialogOpen, setFiltersDialogOpen] = useState(false);
+
+  // Goal settings
+  const [currentGoal, setCurrentGoal] = useState({
+    type: "daily",
+    target: 2,
+    deadline: "",
+    description: "",
+  });
+
+  // Schedule settings
+  const [practiceSchedule, setPracticeSchedule] = useState({
+    frequency: "daily",
+    timeSlot: "morning",
+    duration: 60,
+    preferredDifficulty: "Mixed",
+    categories: [] as string[],
+    customTime: "",
+  });
+
+  // Advanced filters
+  const [advancedFilters, setAdvancedFilters] = useState({
+    importance: [1, 10],
+    companies: [] as string[],
+    lastAttemptDays: null as number | null,
+    onlyStriver: false,
+    hasNotes: false,
+  });
+
   const categories = [...new Set(problems.map((p) => p.category))];
   const difficulties = ["Easy", "Medium", "Hard"];
   const statuses = ["not_started", "attempted", "solved", "reviewed"];
@@ -354,14 +411,301 @@ export default function LeetCode() {
             </p>
           </div>
           <div className="flex items-center space-x-2">
-            <Button variant="outline">
-              <Calendar className="w-4 h-4 mr-2" />
-              Schedule Practice
-            </Button>
-            <Button>
-              <Target className="w-4 h-4 mr-2" />
-              Set Goal
-            </Button>
+            <Dialog
+              open={scheduleDialogOpen}
+              onOpenChange={setScheduleDialogOpen}
+            >
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  <Calendar className="w-4 h-4 mr-2" />
+                  Schedule Practice
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>Schedule Practice Sessions</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-6 py-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="frequency">Frequency</Label>
+                      <Select
+                        value={practiceSchedule.frequency}
+                        onValueChange={(value) =>
+                          setPracticeSchedule((prev) => ({
+                            ...prev,
+                            frequency: value,
+                          }))
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="daily">Daily</SelectItem>
+                          <SelectItem value="weekdays">
+                            Weekdays Only
+                          </SelectItem>
+                          <SelectItem value="weekends">
+                            Weekends Only
+                          </SelectItem>
+                          <SelectItem value="custom">Custom Days</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="timeSlot">Preferred Time</Label>
+                      <Select
+                        value={practiceSchedule.timeSlot}
+                        onValueChange={(value) =>
+                          setPracticeSchedule((prev) => ({
+                            ...prev,
+                            timeSlot: value,
+                          }))
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="morning">
+                            Morning (6-10 AM)
+                          </SelectItem>
+                          <SelectItem value="afternoon">
+                            Afternoon (12-4 PM)
+                          </SelectItem>
+                          <SelectItem value="evening">
+                            Evening (6-9 PM)
+                          </SelectItem>
+                          <SelectItem value="custom">Custom Time</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {practiceSchedule.timeSlot === "custom" && (
+                    <div>
+                      <Label htmlFor="customTime">Custom Time</Label>
+                      <Input
+                        type="time"
+                        value={practiceSchedule.customTime}
+                        onChange={(e) =>
+                          setPracticeSchedule((prev) => ({
+                            ...prev,
+                            customTime: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                  )}
+
+                  <div>
+                    <Label htmlFor="duration">Session Duration (minutes)</Label>
+                    <Select
+                      value={practiceSchedule.duration.toString()}
+                      onValueChange={(value) =>
+                        setPracticeSchedule((prev) => ({
+                          ...prev,
+                          duration: parseInt(value),
+                        }))
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="30">30 minutes</SelectItem>
+                        <SelectItem value="45">45 minutes</SelectItem>
+                        <SelectItem value="60">1 hour</SelectItem>
+                        <SelectItem value="90">1.5 hours</SelectItem>
+                        <SelectItem value="120">2 hours</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="difficulty">Preferred Difficulty</Label>
+                    <Select
+                      value={practiceSchedule.preferredDifficulty}
+                      onValueChange={(value) =>
+                        setPracticeSchedule((prev) => ({
+                          ...prev,
+                          preferredDifficulty: value,
+                        }))
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Easy">Easy Only</SelectItem>
+                        <SelectItem value="Medium">Medium Only</SelectItem>
+                        <SelectItem value="Hard">Hard Only</SelectItem>
+                        <SelectItem value="Mixed">Mixed Difficulty</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label>Focus Categories</Label>
+                    <div className="grid grid-cols-2 gap-2 mt-2">
+                      {categories.map((category) => (
+                        <div
+                          key={category}
+                          className="flex items-center space-x-2"
+                        >
+                          <Checkbox
+                            id={category}
+                            checked={practiceSchedule.categories.includes(
+                              category,
+                            )}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setPracticeSchedule((prev) => ({
+                                  ...prev,
+                                  categories: [...prev.categories, category],
+                                }));
+                              } else {
+                                setPracticeSchedule((prev) => ({
+                                  ...prev,
+                                  categories: prev.categories.filter(
+                                    (c) => c !== category,
+                                  ),
+                                }));
+                              }
+                            }}
+                          />
+                          <Label htmlFor={category}>{category}</Label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end space-x-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => setScheduleDialogOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        // Save schedule logic here
+                        setScheduleDialogOpen(false);
+                        // You could add a toast notification here
+                      }}
+                    >
+                      Save Schedule
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={goalDialogOpen} onOpenChange={setGoalDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Target className="w-4 h-4 mr-2" />
+                  Set Goal
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Set Your Coding Goal</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div>
+                    <Label htmlFor="goalType">Goal Type</Label>
+                    <Select
+                      value={currentGoal.type}
+                      onValueChange={(value) =>
+                        setCurrentGoal((prev) => ({ ...prev, type: value }))
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="daily">Daily Problems</SelectItem>
+                        <SelectItem value="weekly">Weekly Problems</SelectItem>
+                        <SelectItem value="monthly">
+                          Monthly Problems
+                        </SelectItem>
+                        <SelectItem value="streak">Solve Streak</SelectItem>
+                        <SelectItem value="completion">
+                          Complete Study Plan
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="target">Target Number</Label>
+                    <Input
+                      type="number"
+                      value={currentGoal.target}
+                      onChange={(e) =>
+                        setCurrentGoal((prev) => ({
+                          ...prev,
+                          target: parseInt(e.target.value) || 0,
+                        }))
+                      }
+                      placeholder="e.g., 2 problems per day"
+                    />
+                  </div>
+
+                  {currentGoal.type !== "streak" && (
+                    <div>
+                      <Label htmlFor="deadline">Deadline (Optional)</Label>
+                      <Input
+                        type="date"
+                        value={currentGoal.deadline}
+                        onChange={(e) =>
+                          setCurrentGoal((prev) => ({
+                            ...prev,
+                            deadline: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                  )}
+
+                  <div>
+                    <Label htmlFor="description">Description/Notes</Label>
+                    <Textarea
+                      value={currentGoal.description}
+                      onChange={(e) =>
+                        setCurrentGoal((prev) => ({
+                          ...prev,
+                          description: e.target.value,
+                        }))
+                      }
+                      placeholder="Optional notes about your goal..."
+                      rows={3}
+                    />
+                  </div>
+
+                  <div className="flex justify-end space-x-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => setGoalDialogOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        // Save goal logic here
+                        setGoalDialogOpen(false);
+                        // You could add a toast notification here
+                      }}
+                    >
+                      Save Goal
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 
@@ -558,14 +902,377 @@ export default function LeetCode() {
             <CardTitle className="flex items-center justify-between">
               <span>Problems ({filteredProblems.length})</span>
               <div className="flex items-center space-x-2">
-                <Button variant="outline" size="sm">
-                  <BarChart3 className="w-4 h-4 mr-2" />
-                  Analytics
-                </Button>
-                <Button variant="outline" size="sm">
-                  <Filter className="w-4 h-4 mr-2" />
-                  More Filters
-                </Button>
+                <Dialog
+                  open={analyticsDialogOpen}
+                  onOpenChange={setAnalyticsDialogOpen}
+                >
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <BarChart3 className="w-4 h-4 mr-2" />
+                      Analytics
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-4xl">
+                    <DialogHeader>
+                      <DialogTitle>Practice Analytics</DialogTitle>
+                    </DialogHeader>
+                    <Tabs defaultValue="overview" className="w-full">
+                      <TabsList className="grid w-full grid-cols-4">
+                        <TabsTrigger value="overview">Overview</TabsTrigger>
+                        <TabsTrigger value="progress">Progress</TabsTrigger>
+                        <TabsTrigger value="patterns">Patterns</TabsTrigger>
+                        <TabsTrigger value="companies">Companies</TabsTrigger>
+                      </TabsList>
+
+                      <TabsContent value="overview" className="space-y-4">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <Card>
+                            <CardContent className="p-4">
+                              <div className="flex items-center space-x-2">
+                                <PieChart className="w-5 h-5 text-blue-600" />
+                                <div>
+                                  <div className="text-lg font-bold">
+                                    {progressPercentage.toFixed(1)}%
+                                  </div>
+                                  <p className="text-sm text-muted-foreground">
+                                    Overall Progress
+                                  </p>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          <Card>
+                            <CardContent className="p-4">
+                              <div className="flex items-center space-x-2">
+                                <Timer className="w-5 h-5 text-green-600" />
+                                <div>
+                                  <div className="text-lg font-bold">
+                                    {Math.round(
+                                      (problems.filter((p) => p.bestTime)
+                                        .length /
+                                        problems.length) *
+                                        100,
+                                    ) || 0}
+                                    %
+                                  </div>
+                                  <p className="text-sm text-muted-foreground">
+                                    Timed Solutions
+                                  </p>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          <Card>
+                            <CardContent className="p-4">
+                              <div className="flex items-center space-x-2">
+                                <LineChart className="w-5 h-5 text-purple-600" />
+                                <div>
+                                  <div className="text-lg font-bold">
+                                    {(
+                                      problems.reduce(
+                                        (acc, p) => acc + p.attempts,
+                                        0,
+                                      ) / problems.length
+                                    ).toFixed(1)}
+                                  </div>
+                                  <p className="text-sm text-muted-foreground">
+                                    Avg Attempts
+                                  </p>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          <Card>
+                            <CardContent className="p-4">
+                              <div className="flex items-center space-x-2">
+                                <Users className="w-5 h-5 text-orange-600" />
+                                <div>
+                                  <div className="text-lg font-bold">
+                                    {
+                                      new Set(
+                                        problems.flatMap(
+                                          (p) => p.company || [],
+                                        ),
+                                      ).size
+                                    }
+                                  </div>
+                                  <p className="text-sm text-muted-foreground">
+                                    Companies Covered
+                                  </p>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <Card>
+                            <CardHeader>
+                              <CardTitle className="text-sm">
+                                Difficulty Distribution
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="space-y-2">
+                                {difficulties.map((difficulty) => {
+                                  const count = problems.filter(
+                                    (p) => p.difficulty === difficulty,
+                                  ).length;
+                                  const solved = problems.filter(
+                                    (p) =>
+                                      p.difficulty === difficulty &&
+                                      p.status === "solved",
+                                  ).length;
+                                  const percentage =
+                                    count > 0 ? (solved / count) * 100 : 0;
+                                  return (
+                                    <div
+                                      key={difficulty}
+                                      className="flex items-center justify-between"
+                                    >
+                                      <span className="text-sm">
+                                        {difficulty}
+                                      </span>
+                                      <div className="flex items-center space-x-2">
+                                        <div className="w-24 bg-gray-200 rounded-full h-2">
+                                          <div
+                                            className={cn(
+                                              "h-2 rounded-full",
+                                              difficulty === "Easy"
+                                                ? "bg-green-500"
+                                                : difficulty === "Medium"
+                                                  ? "bg-yellow-500"
+                                                  : "bg-red-500",
+                                            )}
+                                            style={{ width: `${percentage}%` }}
+                                          />
+                                        </div>
+                                        <span className="text-sm text-muted-foreground">
+                                          {solved}/{count}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          <Card>
+                            <CardHeader>
+                              <CardTitle className="text-sm">
+                                Category Progress
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="space-y-2">
+                                {categories.map((category) => {
+                                  const count = problems.filter(
+                                    (p) => p.category === category,
+                                  ).length;
+                                  const solved = problems.filter(
+                                    (p) =>
+                                      p.category === category &&
+                                      p.status === "solved",
+                                  ).length;
+                                  const percentage =
+                                    count > 0 ? (solved / count) * 100 : 0;
+                                  return (
+                                    <div
+                                      key={category}
+                                      className="flex items-center justify-between"
+                                    >
+                                      <span className="text-sm">
+                                        {category}
+                                      </span>
+                                      <div className="flex items-center space-x-2">
+                                        <div className="w-24 bg-gray-200 rounded-full h-2">
+                                          <div
+                                            className="h-2 rounded-full bg-primary"
+                                            style={{ width: `${percentage}%` }}
+                                          />
+                                        </div>
+                                        <span className="text-sm text-muted-foreground">
+                                          {solved}/{count}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </div>
+                      </TabsContent>
+
+                      <TabsContent value="progress">
+                        <div className="text-center py-8 text-muted-foreground">
+                          Progress charts would be implemented here with a
+                          charting library like Chart.js or Recharts
+                        </div>
+                      </TabsContent>
+
+                      <TabsContent value="patterns">
+                        <div className="text-center py-8 text-muted-foreground">
+                          Problem pattern analysis would be displayed here
+                        </div>
+                      </TabsContent>
+
+                      <TabsContent value="companies">
+                        <div className="text-center py-8 text-muted-foreground">
+                          Company-specific problem statistics would be shown
+                          here
+                        </div>
+                      </TabsContent>
+                    </Tabs>
+                  </DialogContent>
+                </Dialog>
+
+                <Dialog
+                  open={filtersDialogOpen}
+                  onOpenChange={setFiltersDialogOpen}
+                >
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Filter className="w-4 h-4 mr-2" />
+                      More Filters
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Advanced Filters</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div>
+                        <Label>Importance Level (1-10)</Label>
+                        <div className="flex items-center space-x-2 mt-2">
+                          <span className="text-sm">1</span>
+                          <div className="flex-1 px-2">
+                            <div className="text-center text-sm text-muted-foreground">
+                              Range slider would be implemented here
+                            </div>
+                          </div>
+                          <span className="text-sm">10</span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label>Companies</Label>
+                        <div className="grid grid-cols-2 gap-2 mt-2 max-h-32 overflow-y-auto">
+                          {Array.from(
+                            new Set(problems.flatMap((p) => p.company || [])),
+                          ).map((company) => (
+                            <div
+                              key={company}
+                              className="flex items-center space-x-2"
+                            >
+                              <Checkbox
+                                id={company}
+                                checked={advancedFilters.companies.includes(
+                                  company,
+                                )}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    setAdvancedFilters((prev) => ({
+                                      ...prev,
+                                      companies: [...prev.companies, company],
+                                    }));
+                                  } else {
+                                    setAdvancedFilters((prev) => ({
+                                      ...prev,
+                                      companies: prev.companies.filter(
+                                        (c) => c !== company,
+                                      ),
+                                    }));
+                                  }
+                                }}
+                              />
+                              <Label htmlFor={company} className="text-sm">
+                                {company}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="lastAttempt">
+                          Last Attempted (days ago)
+                        </Label>
+                        <Input
+                          type="number"
+                          placeholder="e.g., 7 for problems attempted in last week"
+                          value={advancedFilters.lastAttemptDays || ""}
+                          onChange={(e) =>
+                            setAdvancedFilters((prev) => ({
+                              ...prev,
+                              lastAttemptDays: e.target.value
+                                ? parseInt(e.target.value)
+                                : null,
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <div className="space-y-3">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="onlyStriver"
+                            checked={advancedFilters.onlyStriver}
+                            onCheckedChange={(checked) =>
+                              setAdvancedFilters((prev) => ({
+                                ...prev,
+                                onlyStriver: !!checked,
+                              }))
+                            }
+                          />
+                          <Label htmlFor="onlyStriver">
+                            Striver Sheet Problems Only
+                          </Label>
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="hasNotes"
+                            checked={advancedFilters.hasNotes}
+                            onCheckedChange={(checked) =>
+                              setAdvancedFilters((prev) => ({
+                                ...prev,
+                                hasNotes: !!checked,
+                              }))
+                            }
+                          />
+                          <Label htmlFor="hasNotes">
+                            Problems with Solution Notes
+                          </Label>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end space-x-2">
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setAdvancedFilters({
+                              importance: [1, 10],
+                              companies: [],
+                              lastAttemptDays: null,
+                              onlyStriver: false,
+                              hasNotes: false,
+                            });
+                          }}
+                        >
+                          Clear Filters
+                        </Button>
+                        <Button onClick={() => setFiltersDialogOpen(false)}>
+                          Apply Filters
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             </CardTitle>
           </CardHeader>
