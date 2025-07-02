@@ -9,6 +9,7 @@ import {
   MessageSquare,
   Target,
   BarChart3,
+  GitBranch,
 } from "lucide-react";
 
 const quickActions = [
@@ -48,7 +49,7 @@ const quickActions = [
     title: "Upload Materials",
     description: "Add study resources",
     icon: Upload,
-    action: "/upload",
+    action: "/materials",
     color: "text-warning",
     bgColor: "bg-warning/10",
   },
@@ -59,6 +60,14 @@ const quickActions = [
     action: "/chat",
     color: "text-purple-600",
     bgColor: "bg-purple-100",
+  },
+  {
+    title: "Mind Maps",
+    description: "Visualize concepts",
+    icon: GitBranch,
+    action: "/mindmap",
+    color: "text-indigo-600",
+    bgColor: "bg-indigo-100",
   },
 ];
 
