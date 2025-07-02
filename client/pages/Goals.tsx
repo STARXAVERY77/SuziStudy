@@ -501,23 +501,23 @@ export default function Goals() {
     <AppLayout>
       <div className="p-6 space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold flex items-center space-x-3">
-              <Target className="w-8 h-8 text-primary" />
+            <h1 className="text-2xl lg:text-3xl font-bold flex items-center space-x-2 lg:space-x-3">
+              <Target className="w-6 h-6 lg:w-8 lg:h-8 text-primary" />
               <span>Goals & Achievements</span>
             </h1>
-            <p className="text-muted-foreground mt-1">
+            <p className="text-sm lg:text-base text-muted-foreground mt-1">
               Track your progress and celebrate your achievements
             </p>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-xs lg:text-sm text-muted-foreground mt-1">
               {getISTDate()} • {currentTime} IST
             </p>
           </div>
           <div className="flex items-center space-x-2">
             <Dialog open={showCreateGoal} onOpenChange={setShowCreateGoal}>
               <DialogTrigger asChild>
-                <Button>
+                <Button className="w-full lg:w-auto">
                   <Plus className="w-4 h-4 mr-2" />
                   Create Goal
                 </Button>
@@ -680,62 +680,72 @@ export default function Goals() {
         </div>
 
         {/* Overview Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6">
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-4">
-                <div className="p-3 bg-blue-100 rounded-lg">
-                  <Trophy className="w-6 h-6 text-blue-600" />
+            <CardContent className="p-4 lg:p-6">
+              <div className="flex items-center space-x-3 lg:space-x-4">
+                <div className="p-2 lg:p-3 bg-blue-100 rounded-lg">
+                  <Trophy className="w-5 h-5 lg:w-6 lg:h-6 text-blue-600" />
                 </div>
                 <div>
-                  <div className="text-2xl font-bold">{activeGoals.length}</div>
-                  <p className="text-sm text-muted-foreground">Active Goals</p>
+                  <div className="text-xl lg:text-2xl font-bold">
+                    {activeGoals.length}
+                  </div>
+                  <p className="text-xs lg:text-sm text-muted-foreground">
+                    Active Goals
+                  </p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-4">
-                <div className="p-3 bg-green-100 rounded-lg">
-                  <CheckCircle className="w-6 h-6 text-green-600" />
+            <CardContent className="p-4 lg:p-6">
+              <div className="flex items-center space-x-3 lg:space-x-4">
+                <div className="p-2 lg:p-3 bg-green-100 rounded-lg">
+                  <CheckCircle className="w-5 h-5 lg:w-6 lg:h-6 text-green-600" />
                 </div>
                 <div>
-                  <div className="text-2xl font-bold">
+                  <div className="text-xl lg:text-2xl font-bold">
                     {completedGoals.length}
                   </div>
-                  <p className="text-sm text-muted-foreground">Completed</p>
+                  <p className="text-xs lg:text-sm text-muted-foreground">
+                    Completed
+                  </p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-4">
-                <div className="p-3 bg-purple-100 rounded-lg">
-                  <Award className="w-6 h-6 text-purple-600" />
+            <CardContent className="p-4 lg:p-6">
+              <div className="flex items-center space-x-3 lg:space-x-4">
+                <div className="p-2 lg:p-3 bg-purple-100 rounded-lg">
+                  <Award className="w-5 h-5 lg:w-6 lg:h-6 text-purple-600" />
                 </div>
                 <div>
-                  <div className="text-2xl font-bold">
+                  <div className="text-xl lg:text-2xl font-bold">
                     {achievements.length}
                   </div>
-                  <p className="text-sm text-muted-foreground">Achievements</p>
+                  <p className="text-xs lg:text-sm text-muted-foreground">
+                    Achievements
+                  </p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-4">
-                <div className="p-3 bg-orange-100 rounded-lg">
-                  <Flame className="w-6 h-6 text-orange-600" />
+            <CardContent className="p-4 lg:p-6">
+              <div className="flex items-center space-x-3 lg:space-x-4">
+                <div className="p-2 lg:p-3 bg-orange-100 rounded-lg">
+                  <Flame className="w-5 h-5 lg:w-6 lg:h-6 text-orange-600" />
                 </div>
                 <div>
-                  <div className="text-2xl font-bold">Level {currentLevel}</div>
-                  <p className="text-sm text-muted-foreground">
+                  <div className="text-xl lg:text-2xl font-bold">
+                    Level {currentLevel}
+                  </div>
+                  <p className="text-xs lg:text-sm text-muted-foreground">
                     {totalPoints} XP
                   </p>
                   <Progress value={levelProgress} className="h-1 mt-1" />
@@ -746,28 +756,39 @@ export default function Goals() {
         </div>
 
         {/* Main Content */}
-        <Tabs defaultValue="goals" className="space-y-6">
+        <Tabs defaultValue="goals" className="space-y-4 lg:space-y-6">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="goals">Goals</TabsTrigger>
-            <TabsTrigger value="progress">Progress</TabsTrigger>
-            <TabsTrigger value="achievements">Achievements</TabsTrigger>
-            <TabsTrigger value="skills">Skills</TabsTrigger>
+            <TabsTrigger value="goals" className="text-xs lg:text-sm">
+              Goals
+            </TabsTrigger>
+            <TabsTrigger value="progress" className="text-xs lg:text-sm">
+              Progress
+            </TabsTrigger>
+            <TabsTrigger value="achievements" className="text-xs lg:text-sm">
+              Achievements
+            </TabsTrigger>
+            <TabsTrigger value="skills" className="text-xs lg:text-sm">
+              Skills
+            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="goals" className="space-y-6">
+          <TabsContent value="goals" className="space-y-4 lg:space-y-6">
             {/* Period Filter */}
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-2 lg:gap-0 lg:space-x-2">
               <span className="text-sm font-medium">View:</span>
-              {(["week", "month", "year"] as const).map((period) => (
-                <Button
-                  key={period}
-                  variant={selectedPeriod === period ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedPeriod(period)}
-                >
-                  {period.charAt(0).toUpperCase() + period.slice(1)}
-                </Button>
-              ))}
+              <div className="flex space-x-2">
+                {(["week", "month", "year"] as const).map((period) => (
+                  <Button
+                    key={period}
+                    variant={selectedPeriod === period ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSelectedPeriod(period)}
+                    className="flex-1 lg:flex-none"
+                  >
+                    {period.charAt(0).toUpperCase() + period.slice(1)}
+                  </Button>
+                ))}
+              </div>
             </div>
 
             {/* Goals Grid */}

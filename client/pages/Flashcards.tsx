@@ -440,13 +440,13 @@ export default function Flashcards() {
     <AppLayout>
       <div className="p-6 space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold">AI Flashcards</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl lg:text-3xl font-bold">AI Flashcards</h1>
+            <p className="text-sm lg:text-base text-muted-foreground">
               Spaced repetition learning with AI-generated content
             </p>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-xs lg:text-sm text-muted-foreground mt-1">
               Current time: {currentTime} IST
             </p>
           </div>
@@ -728,16 +728,20 @@ export default function Flashcards() {
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6">
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-4">
-                <div className="p-3 bg-blue-100 rounded-lg">
-                  <FileText className="w-6 h-6 text-blue-600" />
+            <CardContent className="p-4 lg:p-6">
+              <div className="flex items-center space-x-3 lg:space-x-4">
+                <div className="p-2 lg:p-3 bg-blue-100 rounded-lg">
+                  <FileText className="w-5 h-5 lg:w-6 lg:h-6 text-blue-600" />
                 </div>
                 <div>
-                  <div className="text-2xl font-bold">{flashcards.length}</div>
-                  <p className="text-sm text-muted-foreground">Total Cards</p>
+                  <div className="text-xl lg:text-2xl font-bold">
+                    {flashcards.length}
+                  </div>
+                  <p className="text-xs lg:text-sm text-muted-foreground">
+                    Total Cards
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -865,13 +869,13 @@ export default function Flashcards() {
         </div>
 
         {/* Main Flashcard Interface */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6">
           <div className="lg:col-span-3">
             {currentCard ? (
-              <Card className="min-h-96">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
+              <Card className="min-h-[400px] lg:min-h-96">
+                <CardHeader className="p-4 lg:p-6">
+                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+                    <div className="flex flex-wrap items-center gap-2">
                       <Badge
                         variant="secondary"
                         className={getDifficultyColor(currentCard.difficulty)}
@@ -891,7 +895,7 @@ export default function Flashcards() {
                       )}
                     </div>
 
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center justify-between lg:space-x-2">
                       <span className="text-sm text-muted-foreground">
                         {currentCardIndex + 1} of {filteredCards.length}
                       </span>

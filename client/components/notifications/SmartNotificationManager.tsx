@@ -525,7 +525,7 @@ export function SmartNotificationManager() {
   if (notifications.length === 0) return null;
 
   return (
-    <div className="fixed top-4 right-4 z-50 space-y-3 max-w-sm">
+    <div className="fixed top-4 right-4 z-50 space-y-3 max-w-sm lg:max-w-sm w-[calc(100vw-2rem)] lg:w-auto">
       {/* Controls */}
       <div className="flex justify-end space-x-2">
         <Button
