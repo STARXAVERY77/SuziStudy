@@ -24,6 +24,7 @@ import MemoryManager from "./pages/MemoryManager";
 import DocumentAnalysis from "./pages/DocumentAnalysis";
 import VideoLearning from "./pages/VideoLearning";
 import Settings from "./pages/Settings";
+import Goals from "./pages/Goals";
 import NotFound from "./pages/NotFound";
 import { PlaceholderPage } from "./pages/PlaceholderPage";
 import { Target, Settings as SettingsIcon } from "lucide-react";
