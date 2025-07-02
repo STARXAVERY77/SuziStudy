@@ -22,7 +22,7 @@ import {
   Heart,
   Battery,
   TrendingUp,
-  Memory,
+  Database,
   Upload,
   Mic,
   Volume2,
@@ -310,7 +310,7 @@ export default function AITutor() {
               Upload Material
             </Button>
             <Button variant="outline" size="sm">
-              <Memory className="w-4 h-4 mr-2" />
+              <Database className="w-4 h-4 mr-2" />
               Memory: {memories.length}
             </Button>
           </div>

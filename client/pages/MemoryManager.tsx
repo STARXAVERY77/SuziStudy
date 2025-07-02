@@ -19,7 +19,7 @@ import {
 import { useState } from "react";
 import {
   Brain,
-  Memory,
+  HardDrive,
   Trash2,
   Download,
   Upload,
@@ -637,7 +637,7 @@ export default function MemoryManager() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
-                    <Memory className="w-5 h-5" />
+                    <HardDrive className="w-5 h-5" />
                     <span>Memory Details</span>
                   </CardTitle>
                 </CardHeader>
