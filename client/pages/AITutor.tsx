@@ -551,7 +551,7 @@ export default function AITutor() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <Memory className="w-5 h-5" />
+                  <Database className="w-5 h-5" />
                   <span>AI Memory</span>
                 </CardTitle>
               </CardHeader>
