@@ -57,16 +57,7 @@ const App = () => (
           <Route path="/documents" element={<DocumentAnalysis />} />
           <Route path="/video-learning" element={<VideoLearning />} />
           <Route path="/settings" element={<Settings />} />
-          <Route
-            path="/goals"
-            element={
-              <PlaceholderPage
-                title="Study Goals"
-                description="Set and track your learning objectives and milestones."
-                icon={Target}
-              />
-            }
-          />
+          <Route path="/goals" element={<Goals />} />
           <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
