@@ -17,6 +17,8 @@ import {
   GraduationCap,
   Cpu,
   Database,
+  FileSearch,
+  Play,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -29,6 +31,8 @@ const navigation = [
   { name: "LeetCode", href: "/leetcode", icon: Code },
   { name: "Viva Practice", href: "/viva", icon: GraduationCap },
   { name: "Materials", href: "/materials", icon: FileText },
+  { name: "Documents", href: "/documents", icon: FileSearch },
+  { name: "Video Learning", href: "/video-learning", icon: Play },
   { name: "Mind Maps", href: "/mindmap", icon: GitBranch },
   { name: "Focus Timer", href: "/focus", icon: Timer },
   { name: "Progress", href: "/progress", icon: BarChart3 },
